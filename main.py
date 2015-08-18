@@ -1,63 +1,40 @@
 
-blarghFile = open("ospd.txt","r")
-newDict = blarghFile.readlines()
 
+def iterateLetters(word):
+    count = {} 
+    for letter in word:
+        if letter not in count: count[letter] = 0
+        count[letter] += 1 
+    return count 
 
-userLetters = raw_input("Enter your available letters: ")
+def canBeSpelt(word, rack):
+    word_count = iterateLetters(word)
+    rack_count  = iterateLetters(rack)
+    return all( [word_count[letter] <= rack_count[letter] for letter in word] )  
 
+score = {"a": 1, "c": 3, "b": 3, "e": 1, "d": 2, "g": 2, 
+         "f": 4, "i": 1, "h": 4, "k": 5, "j": 8, "m": 3, 
+         "l": 1, "o": 1, "n": 1, "q": 10, "p": 3, "s": 1, 
+         "r": 1, "u": 1, "t": 1, "w": 4, "v": 4, "y": 4, 
+         "x": 8, "z": 10}
 
-"""Trying to hash out a functino for matching all two letter words"""
-def twoLetterWords(lettersFromUser):
-    indexOfLetters = 0
-    #for x in range(0,len(lettersFromUser)):
-        #for word in 
-        #if (lettersFromUser[indexOfLetters] + lettersFromUser[x]) ==
-        
-"""One time use function for making separate dictionaries for each length of words"""
-def sortDictionary(wordList):
-    twoWordDictionary = open("2 Word Dictionary.txt","w")
-    threeWordDictionary = open("3 Word Dictionary.txt","w")
-    fourWordDictionary = open("4 Word Dictionary.txt","w")
-    fiveWordDictionary = open("5 Word Dictionary.txt","w")
-    sixWordDictionary = open("6 Word Dictionary.txt","w")
-    sevenWordDictionary = open("7 Word Dictionary.txt","w")
-    eightWordDictionary = open("8 Word Dictionary.txt","w")
-    
-    for x in range(0, len(wordList)):
-        if len(wordList[x]) == 2:
-            twoWordDictionary.write(wordList[x] + "\n")
-        elif len(wordList[x]) == 3:
-            threeWordDictionary.write(wordList[x] + "\n")
-        elif len(wordList[x]) == 4:
-            fourWordDictionary.write(wordList[x] + "\n")
-        elif len(wordList[x]) == 5:
-            fiveWordDictionary.write(wordList[x] + "\n")
-        elif len(wordList[x]) == 6:
-            sixWordDictionary.write(wordList[x] + "\n")
-        elif len(wordList[x]) == 7:
-            sevenWordDictionary.write(wordList[x] + "\n")
-        elif len(wordList[x]) == 8:
-            eightWordDictionary.write(wordList[x] + "\n")
-        else:
-            pass
+def score_word(word):
+    return sum([score[c] for c in word])
 
+def readInWord(filename):
+    # returns an iterator
+    return (word.strip() for word in  open(filename)) 
 
-#for i in range(0, len(newDict)):
-    #newDict[i] = newDict[i].rstrip()
-
-#for x in range(x,len(userLetters)):
-    #tempWord = 
-    
-        
-
-
-
-
-'''
-for x in range(0,len(newDict)):
-    if userLetters == newDict[x]:
-        print newDict[x]
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) == 2: 
+        rack = sys.argv[1].strip()
     else:
-        print "No words"
-        '''
-            
+        print """Usage: python main.py (yourletters)"""
+        exit()
+
+    words = readInWord('ospd.txt')
+    scored =  ((score_word(word), word) for word in words if set(word).issubset(set(rack)) and len(word) > 1 and canBeSpelt(word, rack))
+
+    for score, word in sorted(scored):
+        print str(score), '\t', word
